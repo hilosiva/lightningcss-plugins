@@ -1,0 +1,48 @@
+{
+  "name": "lightningcss-plugins-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for @hilosiva lightningcss plugins",
+  "license": "MIT",
+  "author": "Shibata Hironori",
+  "keywords": [
+    "lightningcss",
+    "MCP",
+    "lightningcss-plugins"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hilosiva/lightningcss-plugins.git",
+    "directory": "packages/lightningcss-plugins-mcp"
+  },
+  "bugs": "https://github.com/hilosiva/lightningcss-plugins/issues",
+  "homepage": "https://github.com/hilosiva/lightningcss-plugins",
+  "bin": {
+    "lightningcss-plugins-mcp": "./dist/index.mjs"
+  },
+  "scripts": {
+    "prebuild": "node -e \"require('fs').rmSync('./dist', {recursive:true,force:true})\"",
+    "build": "tsup-node",
+    "dev": "tsup-node --watch"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "provenance": false,
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/node": "^22.2.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10.2",
+    "zod": "^3.25.0"
+  }
+}

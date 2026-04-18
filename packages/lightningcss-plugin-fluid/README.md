@@ -66,6 +66,27 @@ font-size: clamp(1.5rem, 1.25728rem + 1.0356vi, 2.5rem);
 margin-block: clamp(2.5rem, 2.13592rem + 1.5534vi, 4rem) clamp(1.5rem, 0rem + 3.125vi, 2rem);
 ```
 
+## fluid-free()
+
+上限なしで伸び続ける `max()` 関数を生成します。`fluid()` と同じ引数を受け付けます。
+
+```css
+font-size: fluid-free(24px, 40px);
+```
+
+ビルド結果
+```css
+font-size: max(1.5rem, 1.25728rem + 1.0356vi);
+```
+
+`fluid()` との使い分け：
+
+| | `fluid()` | `fluid-free()` |
+|---|-----------|----------------|
+| 出力 | `clamp()` | `max()` |
+| 上限 | あり（maxSize で固定） | なし（大画面でも自由に伸びる） |
+| 向く用途 | 本文・UI コンポーネント | ヒーロー見出し・装飾要素 |
+
 ## 個別単位指定
 
 `fluid()` 関数で個別に単位を指定することで、グローバルの単位設定を上書きできます：
@@ -132,7 +153,7 @@ font-size: clamp((var(--font-sm) * (1rem / 16)), (((var(--font-sm)  - ((var(--fo
 | `minViewPort` | デフォルトとして使う最小ビューポートのpx値（既定値: `375`）  | number / undefined  |
 | `maxViewPort`  |  デフォルトとして使う最大ビューポートのpx値（既定値: `1920`）  | number / undefined |
 | `baseFontSize`  | デフォルトとしてルート要素のフォントサイズpx値（既定値: `16`） | number / undefined |
-| `unit`  | 推奨値に利用する単位（既定値: `"vi"`） | "vi" / "vw" / "cqw" / "cqi" |
+| `unit`  | 推奨値に利用する単位（既定値: `"vi"`） | "vi" / "vw" / "vh" / "vb" / "cqw" / "cqi" |
 
 
 vite.config.js
