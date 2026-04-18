@@ -1,0 +1,17 @@
+{
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "test": {
+      "dependsOn": ["build"]
+    },
+    "dev": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

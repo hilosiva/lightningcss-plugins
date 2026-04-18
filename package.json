@@ -1,68 +1,33 @@
 {
-	"name": "lightningcss-plugin-fluid",
-	"version": "0.0.7",
-	"description": "lightningcss-plugin-fluid is clump function generator",
-	"type": "module",
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"scripts": {
-		"dev": "tsup --watch",
-		"build": "tsup",
-		"test": "vitest",
-		"lint": "biome check .",
-		"lint:fix": "biome check . --write",
-		"format": "biome format .",
-		"format:write": "biome format . --write",
-		"version:patch": "npm version patch --force --no-git-tag-version && pnpm readme",
-		"version:minor": "npm version minor --force --no-git-tag-version && pnpm readme",
-		"version:major": "npm version major --force --no-git-tag-version && pnpm readme",
-		"readme": "node ./scripts/update.js",
-		"publish:main": "npm publish",
-		"publish:beta": "npm publish --tag beta"
-	},
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"require": "./dist/index.cjs",
-			"import": "./dist/index.js"
-		},
-		"./dist/rola.css": "./dist/rola.css"
-	},
-	"publishConfig": {
-		"provenance": false,
-		"access": "public",
-		"exports": {
-			".": {
-				"types": "./dist/index.d.ts",
-				"require": "./dist/index.cjs",
-				"import": "./dist/index.js"
-			}
-		}
-	},
-	"files": [
-		"dist"
-	],
-	"keywords": [
-		"lightningcss-plugin",
-		"clump"
-	],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/hilosiva/lightningcss-plugin-fluid"
-	},
-	"bugs": {
-		"url": "https://github.com/hilosiva/lightningcss-plugin-fluid/issues"
-	},
-	"homepage": "https://github.com/hilosiva/lightningcss-plugin-fluid",
-	"author": "Shibata Hironori",
-	"license": "MIT",
-	"devDependencies": {
-		"@biomejs/biome": "^1.9.4",
-		"@types/node": "^22.13.5",
-		"lightningcss": "^1.29.1",
-		"tsup": "^8.3.5",
-		"typescript": "^5.7.3",
-		"vitest": "^2.1.8"
-	},
-	"packageManager": "pnpm@10.5.2+sha512.da9dc28cd3ff40d0592188235ab25d3202add8a207afbedc682220e4a0029ffbff4562102b9e6e46b4e3f9e8bd53e6d05de48544b0c57d4b0179e22c76d1199b"
+  "name": "@hilosiva/lightningcss-plugins",
+  "version": "0.0.7",
+  "private": true,
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "test": "turbo run test",
+    "lint": "biome check .",
+    "lint:fix": "biome check . --write",
+    "format": "biome format .",
+    "format:write": "biome format . --write",
+    "publish:main": "pnpm --filter=./packages/* publish",
+    "publish:beta": "pnpm --filter=./packages/* publish --tag beta"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hilosiva/lightningcss-plugins"
+  },
+  "keywords": [],
+  "author": "Shibata Hironori",
+  "license": "MIT",
+  "description": "",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.13.5",
+    "tsup": "^8.3.5",
+    "turbo": "^2.0.12",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  },
+  "packageManager": "pnpm@10.5.2+sha512.da9dc28cd3ff40d0592188235ab25d3202add8a207afbedc682220e4a0029ffbff4562102b9e6e46b4e3f9e8bd53e6d05de48544b0c57d4b0179e22c76d1199b"
 }
