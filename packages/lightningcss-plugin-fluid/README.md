@@ -174,3 +174,24 @@ export default defineConfig({
   },
 });
 ```
+
+## Claude Code MCP サーバー
+
+[lightningcss-plugins-mcp](https://www.npmjs.com/package/lightningcss-plugins-mcp) を使うと、Claude Code がこのプラグインのセットアップ・オプション・関数の使い方を直接参照できます。
+
+```bash
+pnpm add lightningcss-plugins-mcp -D
+```
+
+`.mcp.json` に追加：
+
+```json
+{
+  "mcpServers": {
+    "lightningcss-plugins": {
+      "command": "npx",
+      "args": ["lightningcss-plugins-mcp"]
+    }
+  }
+}
+```
