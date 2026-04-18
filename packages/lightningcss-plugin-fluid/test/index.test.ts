@@ -134,6 +134,81 @@ describe("fluidVisitor", () => {
 		expect(output).not.toContain("vi");
 	});
 
+	it("should handle vh and vb units", () => {
+		const inputVh = "p {font-size: fluid(16px, 24px, vh)} ";
+
+		const outputVh = transform({
+			filename: "input.css",
+			code: Buffer.from(inputVh),
+			minify: false,
+			sourceMap: false,
+			drafts: { customMedia: true },
+			nonStandard: { deepSelectorCombinator: true },
+			errorRecovery: true,
+			visitor: composeVisitors([fluidVisitor()]),
+		}).code.toString();
+
+		console.log(outputVh);
+		expect(outputVh).toContain("clamp");
+		expect(outputVh).toContain("vh");
+
+		const inputVb = "p {font-size: fluid(16px, 24px, vb)} ";
+
+		const outputVb = transform({
+			filename: "input.css",
+			code: Buffer.from(inputVb),
+			minify: false,
+			sourceMap: false,
+			drafts: { customMedia: true },
+			nonStandard: { deepSelectorCombinator: true },
+			errorRecovery: true,
+			visitor: composeVisitors([fluidVisitor()]),
+		}).code.toString();
+
+		console.log(outputVb);
+		expect(outputVb).toContain("clamp");
+		expect(outputVb).toContain("vb");
+	});
+
+	it("fluid-free should output max() without upper bound", () => {
+		const input = "p {font-size: fluid-free(16px, 24px)} ";
+
+		const output = transform({
+			filename: "input.css",
+			code: Buffer.from(input),
+			minify: false,
+			sourceMap: false,
+			drafts: { customMedia: true },
+			nonStandard: { deepSelectorCombinator: true },
+			errorRecovery: true,
+			visitor: composeVisitors([fluidVisitor()]),
+		}).code.toString();
+
+		console.log(output);
+		expect(output).toContain("max(");
+		expect(output).not.toContain("clamp");
+		expect(output).toContain("1rem");
+	});
+
+	it("fluid-free should respect individual unit", () => {
+		const input = "p {font-size: fluid-free(16px, 24px, vw)} ";
+
+		const output = transform({
+			filename: "input.css",
+			code: Buffer.from(input),
+			minify: false,
+			sourceMap: false,
+			drafts: { customMedia: true },
+			nonStandard: { deepSelectorCombinator: true },
+			errorRecovery: true,
+			visitor: composeVisitors([fluidVisitor()]),
+		}).code.toString();
+
+		console.log(output);
+		expect(output).toContain("max(");
+		expect(output).toContain("vw");
+	});
+
 	it("should use global config when no individual unit specified", () => {
 		const input = "p {font-size: fluid(16px, 24px)} ";
 

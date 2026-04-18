@@ -1,6 +1,6 @@
 {
 	"name": "lightningcss-plugin-fluid",
-	"version": "0.0.7",
+	"version": "0.1.0",
 	"description": "lightningcss-plugin-fluid is clump function generator",
 	"type": "module",
 	"main": "dist/index.js",
@@ -48,12 +48,12 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/hilosiva/lightningcss-plugin-fluid"
+		"url": "https://github.com/hilosiva/lightningcss-plugins"
 	},
 	"bugs": {
-		"url": "https://github.com/hilosiva/lightningcss-plugin-fluid/issues"
+		"url": "https://github.com/hilosiva/lightningcss-plugins/issues"
 	},
-	"homepage": "https://github.com/hilosiva/lightningcss-plugin-fluid",
+	"homepage": "https://github.com/hilosiva/lightningcss-plugins",
 	"author": "Shibata Hironori",
 	"license": "MIT",
 	"devDependencies": {
