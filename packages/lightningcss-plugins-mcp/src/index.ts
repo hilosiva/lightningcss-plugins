@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-import fs from "node:fs";
-import path from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
@@ -204,92 +202,56 @@ font-size: fluid-free(16px, 24px, vw);
 `;
 
 // =====================
-// Helpers
-// =====================
-
-function detectInstalledPackages(cwd: string): {
-  hasFluid: boolean;
-} {
-  const packageJsonPath = path.join(cwd, "package.json");
-  try {
-    const content = fs.readFileSync(packageJsonPath, "utf-8");
-    const pkg = JSON.parse(content);
-    const deps = {
-      ...pkg.dependencies,
-      ...pkg.devDependencies,
-    };
-    return {
-      hasFluid: "lightningcss-plugin-fluid" in deps,
-    };
-  } catch {
-    return { hasFluid: true };
-  }
-}
-
-// =====================
 // MCP Server
 // =====================
 
 const server = new McpServer({
   name: "lightningcss-plugins-mcp",
-  version: "0.1.0",
+  version: "0.2.0",
 });
 
-const cwd = process.cwd();
-const { hasFluid } = detectInstalledPackages(cwd);
+const TOOL_ANNOTATIONS = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+} as const;
 
-if (hasFluid) {
-  server.registerTool(
-    "get_fluid_setup",
-    {
-      description: "lightningcss-plugin-fluid のインストール・vite.config 設定・CSS での基本的な使い方を返す",
-      inputSchema: {},
-      annotations: {
-        readOnlyHint: true,
-        destructiveHint: false,
-        idempotentHint: true,
-        openWorldHint: false,
-      },
-    },
-    async () => ({
-      content: [{ type: "text", text: FLUID_SETUP_GUIDE }],
-    })
-  );
+server.registerTool(
+  "get_fluid_setup",
+  {
+    description: "lightningcss-plugin-fluid のインストール・vite.config 設定・CSS での基本的な使い方を返す",
+    inputSchema: {},
+    annotations: TOOL_ANNOTATIONS,
+  },
+  async () => ({
+    content: [{ type: "text", text: FLUID_SETUP_GUIDE }],
+  })
+);
 
-  server.registerTool(
-    "get_fluid_options",
-    {
-      description: "lightningcss-plugin-fluid の全オプション（minViewPort・maxViewPort・baseFontSize・unit）の詳細を返す",
-      inputSchema: {},
-      annotations: {
-        readOnlyHint: true,
-        destructiveHint: false,
-        idempotentHint: true,
-        openWorldHint: false,
-      },
-    },
-    async () => ({
-      content: [{ type: "text", text: FLUID_OPTIONS_GUIDE }],
-    })
-  );
+server.registerTool(
+  "get_fluid_options",
+  {
+    description: "lightningcss-plugin-fluid の全オプション（minViewPort・maxViewPort・baseFontSize・unit）の詳細を返す",
+    inputSchema: {},
+    annotations: TOOL_ANNOTATIONS,
+  },
+  async () => ({
+    content: [{ type: "text", text: FLUID_OPTIONS_GUIDE }],
+  })
+);
 
-  server.registerTool(
-    "get_fluid_functions",
-    {
-      description: "fluid() と fluid-free() の引数・出力・使い分けのリファレンスを返す",
-      inputSchema: {},
-      annotations: {
-        readOnlyHint: true,
-        destructiveHint: false,
-        idempotentHint: true,
-        openWorldHint: false,
-      },
-    },
-    async () => ({
-      content: [{ type: "text", text: FLUID_FUNCTIONS_GUIDE }],
-    })
-  );
-}
+server.registerTool(
+  "get_fluid_functions",
+  {
+    description: "fluid() と fluid-free() の引数・出力・使い分けのリファレンスを返す",
+    inputSchema: {},
+    annotations: TOOL_ANNOTATIONS,
+  },
+  async () => ({
+    content: [{ type: "text", text: FLUID_FUNCTIONS_GUIDE }],
+  })
+);
 
 async function main() {
   const transport = new StdioServerTransport();
