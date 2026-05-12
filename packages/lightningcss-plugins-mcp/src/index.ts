@@ -9,7 +9,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 const FLUID_SETUP_GUIDE = `
 # lightningcss-plugin-fluid セットアップガイド
 
-CSS の \`fluid()\` / \`fluid-free()\` 関数を \`clamp()\` / \`max()\` に変換する lightningcss プラグインです。
+CSS の \`fluid()\` 関数を \`clamp()\` / \`max()\` / \`min()\` / \`calc()\` に変換する lightningcss プラグインです。
 
 ## インストール
 
@@ -22,6 +22,7 @@ pnpm add lightningcss-plugin-fluid -D
 \`\`\`ts
 import { defineConfig } from "vite";
 import lightningcss from "vite-plugin-lightningcss"; // or vite built-in css.transformer
+import fluidVisitor from "lightningcss-plugin-fluid";
 
 export default defineConfig({
   css: {
@@ -41,40 +42,48 @@ export default defineConfig({
 ## CSS での使い方
 
 \`\`\`css
-/* fluid(minSize, maxSize) */
+/* 基本（clamp 出力） */
 .title {
-  font-size: fluid(24px, 48px);
+  font-size: fluid(24px 48px);
 }
 
-/* fluid-free(minSize, maxSize) — 上限なしで伸び続ける */
+/* ビューポート上書き */
+.title {
+  font-size: fluid(24px 48px, 375px 1280px);
+}
+
+/* 上限なし（max() 出力） */
 .hero {
-  font-size: fluid-free(24px, 48px);
+  font-size: fluid(24px 48px, free-max);
 }
 
-/* 個別に単位指定 */
-.text {
-  font-size: fluid(16px, 24px, vw);
+/* snap モード（カンプ幅でスナップして対応幅へ外挿） */
+.catch {
+  font-size: fluid(40px 80px, snap);
 }
 
-/* ビューポートも指定 */
+/* global snap 設定済み時に classic に戻す */
 .text {
-  font-size: fluid(16px, 24px, 375px, 1280px);
+  font-size: fluid(16px 24px, fit);
 }
 
-/* ビューポート + 単位を両方指定 */
+/* 単位指定 */
 .text {
-  font-size: fluid(16px, 24px, 375px, 1280px, vw);
+  font-size: fluid(16px 24px, vw);
 }
 \`\`\`
 
 ## 出力例
 
 \`\`\`css
-/* fluid() → clamp() */
-font-size: clamp(1.5rem, .878641rem + .517799vi, 3rem);
+/* fluid(16px 24px) → clamp() */
+font-size: clamp(1rem, calc(.878641rem + .517799vi), 1.5rem);
 
-/* fluid-free() → max()（上限なし） */
-font-size: max(1.5rem, .878641rem + .517799vi);
+/* fluid(16px 24px, free-max) → max() */
+font-size: max(1rem, calc(.878641rem + .517799vi));
+
+/* fluid(40px 80px, snap) → clamp()（カンプ幅: 440–1440px） */
+font-size: clamp(2.3375rem, calc(1.4rem + 4vi), 6.2rem);
 \`\`\`
 `;
 
@@ -118,87 +127,185 @@ px → rem 変換の基準フォントサイズ。
 | \`cqw\` | コンテナ幅 | コンテナクエリ対応 |
 | \`cqi\` | コンテナインライン軸 | コンテナクエリ・推奨 |
 
+## compMinViewPort
+
+- **型**: \`number\`
+- **デフォルト**: \`440\`
+
+\`snap\` モード使用時のカンプ最小幅（px）。CSS内で compMinVP を省略した時に使われる。
+
+## compMaxViewPort
+
+- **型**: \`number\`
+- **デフォルト**: \`1440\`
+
+\`snap\` モード使用時のカンプ最大幅（px）。CSS内で compMaxVP を省略した時に使われる。
+
+## mode
+
+- **型**: \`"snap" | undefined\`
+- **デフォルト**: \`undefined\`
+
+\`"snap"\` を設定すると、すべての \`fluid()\` 呼び出しがデフォルトで snap モードになります。
+プロパティ単位で \`fit\` キーワードを使うと classic モードに戻せます。
+
 \`\`\`ts
 fluidVisitor({
-  unit: "cqi", // コンテナクエリベースに変更
+  compMinViewPort: 440,
+  compMaxViewPort: 1440,
+  mode: "snap", // 全体を snap モードに
 })
 \`\`\`
 `;
 
 const FLUID_FUNCTIONS_GUIDE = `
-# fluid() / fluid-free() 関数リファレンス
+# fluid() 関数リファレンス
 
-## fluid()
+\`fluid()\` 単一の関数で、キーワード引数によってすべての出力パターンに対応します。
 
-\`clamp(minSize, preferred, maxSize)\` を生成します。上下限ともに固定されます。
-
-### 構文
+## 基本構文
 
 \`\`\`
-fluid(minSize, maxSize)
-fluid(minSize, maxSize, unit)
-fluid(minSize, maxSize, minViewPort, maxViewPort)
-fluid(minSize, maxSize, minViewPort, maxViewPort, unit)
+fluid(minSize maxSize)
+fluid(minSize maxSize, minVP maxVP)
+fluid(minSize maxSize, outputKeyword)
+fluid(minSize maxSize, minVP maxVP, outputKeyword)
+fluid(minSize maxSize, outputKeyword, unit)
+fluid(minSize maxSize, minVP maxVP, outputKeyword, unit)
 \`\`\`
 
-### 引数
+引数はカンマ区切りのグループで構成され、キーワード・単位はどのグループに書いても順不同で認識されます。
 
-| 引数 | 型 | 説明 |
-|------|----|------|
-| minSize | px / rem | 最小サイズ（必須） |
-| maxSize | px / rem | 最大サイズ（必須） |
-| unit | vi / vw / vh / vb / cqw / cqi | 個別単位指定（省略可） |
-| minViewPort | px | 最小ビューポート（省略可） |
-| maxViewPort | px | 最大ビューポート（省略可） |
+---
+
+## キーワード一覧
+
+| キーワード | 意味 |
+|---|---|
+| \`snap\` | このプロパティだけ snap モードで計算（カンプ幅で外挿） |
+| \`fit\` | global snap 設定時にこのプロパティだけ classic モードに戻す |
+| \`free-max\` | \`max()\` 出力（上限なし） |
+| \`free-min\` | \`min()\` 出力（下限なし） |
+| \`free\` | \`calc()\` のみ（上下限なし） |
+| \`vw\` 等 | 単位上書き（vi / vw / vh / vb / cqw / cqi） |
+
+---
+
+## Classic モード（デフォルト）
+
+対応ビューポート幅（minViewPort–maxViewPort）を基準に線形補間します。
+
+**数式:**
+\`\`\`
+m = (maxSize - minSize) / (maxVP - minVP)
+b = minSize - m * minVP
+preferred = calc(b_rem + m * 100<unit>)
+\`\`\`
+
+**出力パターン:**
+| キーワード | 出力 |
+|---|---|
+| （なし） | \`clamp(minSize_rem, preferred, maxSize_rem)\` |
+| \`free-max\` | \`max(minSize_rem, preferred)\` |
+| \`free-min\` | \`min(preferred, maxSize_rem)\` |
+| \`free\` | \`preferred\`（calc のみ） |
 
 ### 使用例
 
 \`\`\`css
 /* 基本 */
-font-size: fluid(16px, 24px);
-/* → clamp(1rem, .878641rem + .517799vi, 1.5rem) */
+font-size: fluid(16px 24px);
+/* → clamp(1rem, calc(.878641rem + .517799vi), 1.5rem) */
+
+/* ビューポート上書き */
+font-size: fluid(16px 24px, 375px 1280px);
+/* → clamp(1rem, calc(.792818rem + .883978vi), 1.5rem) */
+
+/* 上限なし */
+font-size: fluid(16px 24px, free-max);
+/* → max(1rem, calc(.878641rem + .517799vi)) */
 
 /* 単位指定 */
-font-size: fluid(16px, 24px, vw);
-/* → clamp(1rem, .878641rem + .517799vw, 1.5rem) */
+font-size: fluid(16px 24px, vw);
+/* → clamp(1rem, calc(.878641rem + .517799vw), 1.5rem) */
 
-/* ビューポート指定 */
-font-size: fluid(16px, 24px, 375px, 1280px);
-/* → clamp(1rem, .833333rem + .833333vi, 1.5rem) */
+/* 複合 */
+font-size: fluid(16px 24px, free-max, vw);
+/* → max(1rem, calc(.878641rem + .517799vw)) */
 
 /* CSS カスタムプロパティ */
-font-size: fluid(var(--font-sm), var(--font-lg));
+font-size: fluid(var(--font-sm) var(--font-lg));
 \`\`\`
 
 ---
 
-## fluid-free()
+## Snap モード
 
-\`max(minSize, preferred)\` を生成します。下限のみ固定し、上限なしで伸び続けます。
+カンプ（デザインカンプ）の幅を基準に線形外挿します。
+カンプ幅でのサイズが実際の対応ブラウザ幅でも再現されます。
 
-### 構文
+**有効化方法:**
+- インライン: \`snap\` キーワードを追加
+- グローバル: オプションで \`mode: "snap"\` を設定
 
-\`fluid()\` と同じ引数を受け付けます（maxSize は傾き計算にのみ使用）。
+**数式（線形外挿）:**
+\`\`\`
+m = (maxSize - minSize) / (compMaxVP - compMinVP)
+b = minSize - m * compMinVP
+preferred = calc(b_rem + m * 100<unit>)
+
+clampMin = floor_rem or S(minViewPort)_rem
+clampMax = ceiling_rem or S(maxViewPort)_rem
+\`\`\`
+
+**構文（snap 時、lengthペアの解釈が変わる）:**
+\`\`\`
+fluid(minSize maxSize, snap)
+fluid(minSize maxSize, compMinVP compMaxVP, snap)
+fluid(minSize maxSize, compMinVP compMaxVP, floor ceiling, snap)
+fluid(minSize maxSize, snap, free-max)
+fluid(minSize maxSize, snap, free-max, vw)
+\`\`\`
 
 ### 使用例
 
 \`\`\`css
-/* 基本 */
-font-size: fluid-free(16px, 24px);
-/* → max(1rem, .878641rem + .517799vi) */
+/* 基本（compMinViewPort: 440 / compMaxViewPort: 1440 設定済み） */
+font-size: fluid(40px 80px, snap);
+/* → clamp(2.3375rem, calc(1.4rem + 4vi), 6.2rem) */
 
-/* 単位指定 */
-font-size: fluid-free(16px, 24px, vw);
-/* → max(1rem, .878641rem + .517799vw) */
+/* カンプ幅をプロパティ単位で上書き */
+font-size: fluid(40px 80px, 768px 1440px, snap);
+
+/* floor / ceiling で絶対上下限を指定 */
+font-size: fluid(14px 16px, 440px 1440px, 14px 18px, snap);
+/* → clamp(.875rem, calc(.82rem + .2vi), 1.125rem) */
+
+/* snap + 出力モード */
+font-size: fluid(40px 80px, snap, free-max);
+/* → max(2.3375rem, calc(1.4rem + 4vi)) */
+
+/* snap + 単位（キーワードは順不同） */
+font-size: fluid(40px 80px, free-max, snap, vw);
+/* → max(2.3375rem, calc(1.4rem + 4vw)) */
 \`\`\`
 
-### fluid() との使い分け
+---
 
-| | fluid() | fluid-free() |
-|---|---------|-------------|
-| 出力 | clamp() | max() |
-| 上限 | あり（maxSize で固定） | なし（大画面で自由に伸びる） |
-| 向く用途 | 本文・UI コンポーネント | ヒーロー見出し・装飾要素 |
+## Global snap + inline fit（Classic に戻す）
+
+\`mode: "snap"\` 設定時、特定プロパティだけ classic に戻したい場合は \`fit\` を使います。
+
+\`\`\`css
+/* mode: "snap" 設定済みでも、この1行だけ classic */
+font-size: fluid(40px 80px, fit);
+
+/* classic + 対応幅上書き */
+font-size: fluid(40px 80px, 375px 1280px, fit);
+
+/* classic + free-max */
+font-size: fluid(40px 80px, fit, free-max);
+\`\`\`
 `;
 
 // =====================
@@ -207,7 +314,7 @@ font-size: fluid-free(16px, 24px, vw);
 
 const server = new McpServer({
   name: "lightningcss-plugins-mcp",
-  version: "0.2.0",
+  version: "0.3.0",
 });
 
 const TOOL_ANNOTATIONS = {
@@ -232,7 +339,7 @@ server.registerTool(
 server.registerTool(
   "get_fluid_options",
   {
-    description: "lightningcss-plugin-fluid の全オプション（minViewPort・maxViewPort・baseFontSize・unit）の詳細を返す",
+    description: "lightningcss-plugin-fluid の全オプション（minViewPort・maxViewPort・baseFontSize・unit・compMinViewPort・compMaxViewPort・mode）の詳細を返す",
     inputSchema: {},
     annotations: TOOL_ANNOTATIONS,
   },
@@ -244,7 +351,7 @@ server.registerTool(
 server.registerTool(
   "get_fluid_functions",
   {
-    description: "fluid() と fluid-free() の引数・出力・使い分けのリファレンスを返す",
+    description: "fluid() 関数の引数・キーワード・出力パターン・使用例のリファレンスを返す",
     inputSchema: {},
     annotations: TOOL_ANNOTATIONS,
   },
