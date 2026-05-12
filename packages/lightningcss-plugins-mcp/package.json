@@ -1,6 +1,6 @@
 {
   "name": "lightningcss-plugins-mcp",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "MCP server for @hilosiva lightningcss plugins",
   "license": "MIT",
   "author": "Shibata Hironori",

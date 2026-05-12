@@ -86,8 +86,8 @@ describe("Classic モード", () => {
 
 describe("Snap モード（inline）", () => {
 	const snapConfig: Partial<Config> = {
-		compMinViewPort: 440,
-		compMaxViewPort: 1440,
+		minCompSize: 440,
+		maxCompSize: 1440,
 	};
 
 	it("基本: fluid(40px 80px, snap) → clamp と calc", () => {
@@ -175,8 +175,8 @@ describe("Snap モード（inline）", () => {
 
 describe("Global snap モード（mode: \"snap\"）", () => {
 	const globalSnapConfig: Partial<Config> = {
-		compMinViewPort: 440,
-		compMaxViewPort: 1440,
+		minCompSize: 440,
+		maxCompSize: 1440,
 		mode: "snap",
 	};
 

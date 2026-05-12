@@ -16,8 +16,8 @@ export interface Config {
 	maxViewPort: number;
 	baseFontSize: number;
 	unit: FluidUnit;
-	compMinViewPort?: number;
-	compMaxViewPort?: number;
+	minCompSize?: number;
+	maxCompSize?: number;
 	mode?: FluidMode;
 }
 
@@ -35,8 +35,8 @@ const DEFAULT_CONFIG: Config = {
 	maxViewPort: 1920,
 	baseFontSize: 16,
 	unit: "vi",
-	compMinViewPort: 440,
-	compMaxViewPort: 1440,
+	minCompSize: 440,
+	maxCompSize: 1440,
 	mode: undefined,
 };
 
@@ -252,9 +252,9 @@ function buildFluidOutput(
 		);
 	} else {
 		// snap モード
-		if (options.compMinViewPort === undefined || options.compMaxViewPort === undefined) {
+		if (options.minCompSize === undefined || options.maxCompSize === undefined) {
 			console.warn(
-				"[lightningcss-plugin-fluid] snap モードには compMinViewPort / compMaxViewPort が必要です。classic にフォールバックします。",
+				"[lightningcss-plugin-fluid] snap モードには minCompSize / maxCompSize が必要です。classic にフォールバックします。",
 			);
 			return buildClassicOutput(
 				minSizePx,
@@ -322,8 +322,8 @@ function buildSnapOutput(
 	outputMode: OutputMode,
 ): string {
 	const { baseFontSize, minViewPort, maxViewPort } = options;
-	const compMinVP = options.compMinViewPort!;
-	const compMaxVP = options.compMaxViewPort!;
+	const compMinVP = options.minCompSize!;
+	const compMaxVP = options.maxCompSize!;
 
 	// length pair の解釈
 	// snap モード: pair1 = compVP 上書き, pair2 = floor/ceiling

@@ -146,8 +146,8 @@ font-size: fluid(var(--font-sm) var(--font-lg));
 | `maxViewPort` | `1920` | `number` | 対応ブラウザの最大ビューポート幅（px） |
 | `baseFontSize` | `16` | `number` | px → rem 変換の基準フォントサイズ |
 | `unit` | `"vi"` | `"vi" \| "vw" \| "vh" \| "vb" \| "cqw" \| "cqi"` | 流体スケーリングに使用する単位 |
-| `compMinViewPort` | `440` | `number` | snap モードのカンプ最小幅デフォルト（px） |
-| `compMaxViewPort` | `1440` | `number` | snap モードのカンプ最大幅デフォルト（px） |
+| `minCompSize` | `440` | `number` | snap モードのカンプ最小幅デフォルト（px） |
+| `maxCompSize` | `1440` | `number` | snap モードのカンプ最大幅デフォルト（px） |
 | `mode` | `undefined` | `"snap" \| undefined` | `"snap"` でプロジェクト全体をスナップモードに |
 
 ```ts
@@ -158,8 +158,8 @@ fluidVisitor({
   unit: "vi",
 
   // snap モードを使う場合
-  compMinViewPort: 440,
-  compMaxViewPort: 1440,
+  minCompSize: 440,
+  maxCompSize: 1440,
   mode: "snap", // 全体スナップON（省略時は inline snap キーワードのみ有効）
 })
 ```

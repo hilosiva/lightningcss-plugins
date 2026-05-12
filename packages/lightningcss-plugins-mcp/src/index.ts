@@ -127,14 +127,14 @@ px → rem 変換の基準フォントサイズ。
 | \`cqw\` | コンテナ幅 | コンテナクエリ対応 |
 | \`cqi\` | コンテナインライン軸 | コンテナクエリ・推奨 |
 
-## compMinViewPort
+## minCompSize
 
 - **型**: \`number\`
 - **デフォルト**: \`440\`
 
 \`snap\` モード使用時のカンプ最小幅（px）。CSS内で compMinVP を省略した時に使われる。
 
-## compMaxViewPort
+## maxCompSize
 
 - **型**: \`number\`
 - **デフォルト**: \`1440\`
@@ -151,8 +151,8 @@ px → rem 変換の基準フォントサイズ。
 
 \`\`\`ts
 fluidVisitor({
-  compMinViewPort: 440,
-  compMaxViewPort: 1440,
+  minCompSize: 440,
+  maxCompSize: 1440,
   mode: "snap", // 全体を snap モードに
 })
 \`\`\`
@@ -270,7 +270,7 @@ fluid(minSize maxSize, snap, free-max, vw)
 ### 使用例
 
 \`\`\`css
-/* 基本（compMinViewPort: 440 / compMaxViewPort: 1440 設定済み） */
+/* 基本（minCompSize: 440 / maxCompSize: 1440 設定済み） */
 font-size: fluid(40px 80px, snap);
 /* → clamp(2.3375rem, calc(1.4rem + 4vi), 6.2rem) */
 
@@ -314,7 +314,7 @@ font-size: fluid(40px 80px, fit, free-max);
 
 const server = new McpServer({
   name: "lightningcss-plugins-mcp",
-  version: "0.3.0",
+  version: "0.3.1",
 });
 
 const TOOL_ANNOTATIONS = {
@@ -339,7 +339,7 @@ server.registerTool(
 server.registerTool(
   "get_fluid_options",
   {
-    description: "lightningcss-plugin-fluid の全オプション（minViewPort・maxViewPort・baseFontSize・unit・compMinViewPort・compMaxViewPort・mode）の詳細を返す",
+    description: "lightningcss-plugin-fluid の全オプション（minViewPort・maxViewPort・baseFontSize・unit・minCompSize・maxCompSize・mode）の詳細を返す",
     inputSchema: {},
     annotations: TOOL_ANNOTATIONS,
   },
