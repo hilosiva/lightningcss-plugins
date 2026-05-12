@@ -150,6 +150,15 @@ function parseFluidArgs(
 	let foundUnit: FluidUnit | null = null;
 	const lengthPairs: LengthPair[] = [];
 
+	// g0 の3トークン目以降にキーワード・単位が書かれている場合（カンマなし構文）を処理
+	// 例: fluid(16px 24px snap free-max vw)
+	for (let i = 2; i < g0.length; i++) {
+		const ident = getIdentValue(g0[i]);
+		if (!ident) continue;
+		if (KEYWORDS.has(ident)) foundKeywords.add(ident);
+		else if (SUPPORTED_UNITS.has(ident)) foundUnit = ident as FluidUnit;
+	}
+
 	for (let i = 1; i < groups.length; i++) {
 		const g = groups[i];
 

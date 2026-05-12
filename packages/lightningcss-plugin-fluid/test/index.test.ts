@@ -151,6 +151,22 @@ describe("Snap モード（inline）", () => {
 		expect(output).toContain("max(");
 		expect(output).toContain("vw");
 	});
+
+	it("カンマなし構文: fluid(40px 80px snap free-max) → max() と calc（snap モード）", () => {
+		const output = transform_("p { font-size: fluid(40px 80px snap free-max) }", snapConfig);
+		console.log(output);
+		expect(output).toContain("max(");
+		expect(output).toContain("calc(");
+		expect(output).not.toContain("clamp(");
+	});
+
+	it("カンマなし構文: fluid(16px 24px free-max vw) → max() と vw（classic）", () => {
+		const output = transform_("p { font-size: fluid(16px 24px free-max vw) }");
+		console.log(output);
+		expect(output).toContain("max(");
+		expect(output).toContain("vw");
+		expect(output).not.toContain("clamp(");
+	});
 });
 
 // ----------------------------------------------------------------
